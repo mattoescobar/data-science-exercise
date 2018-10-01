@@ -17,7 +17,7 @@ We are interested in how you approach an open-ended machine learning problem.
 We encourage plotting and data exploration, as well as readable and re-usable code.
 
 - use `python 3`
-- fork this repository
+- fork (or clone) this repository
 - commit all your code (including Jupyter Notebooks, exploratory work etc.)
 - submit a pull request (or a zip file) when you are finished
 - please make sure the code includes two files:
