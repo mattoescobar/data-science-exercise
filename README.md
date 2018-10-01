@@ -19,7 +19,7 @@ We encourage plotting and data exploration, as well as readable and re-usable co
 - use `python 3`
 - fork this repository
 - commit all your code (including Jupyter Notebooks, exploratory work etc.)
-- submit a pull request when you are finished
+- submit a pull request (or a zip file) when you are finished
 - please make sure the code includes two files:
   * `train.py` should read the training data, perform any steps needed,
     and save a single file containing the trained forecasting model (e.g. `model.ext`)
