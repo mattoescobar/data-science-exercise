@@ -71,3 +71,6 @@ for i in range(len(id_arr)):
     plt.ylabel('Usage')
     plt.legend()
     plt.show()
+
+# Saving predictions
+np.savetxt("usage_test_predictions.csv", y_pred_unlabelled, delimiter=",")
