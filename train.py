@@ -4,6 +4,7 @@ import pandas as pd
 from xgboost import XGBRegressor
 import pickle
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
+from sklearn.metrics import mean_squared_error
 
 def feature_engineering(dataset, time_delay=1):
     # Split data per household
@@ -82,4 +83,25 @@ regressor = XGBRegressor(n_estimators=best_parameters['n_estimators'], max_depth
                          learning_rate=best_parameters['learning_rate'])
 regressor.fit(X_train, y_train)
 
+# Predicted values for training data
+y_pred_train = regressor.predict(X_train).reshape(-1, 1)
+# Mean squared error evaluation of training data
+mse = mean_squared_error(y_train, y_pred_train)
+
+# Displaying first 30 values for each household
+id_list = dataset_train['id'].unique()
+len_household = int(y_train.shape[0] / len(id_list))
+for i in range(len(id_list)):
+    plt.plot(y_train[len_household*i:200+len_household*i, 0], color='red', label=[id_list[i] + ' actual values'])
+    plt.plot(y_pred_train[len_household*i:200+len_household*i, 0], color='blue', label=[id_list[i] + ' predicted values'])
+    plt.title('Usage for the ' + id_list[i] + ' household')
+    plt.xlabel('Time')
+    plt.ylabel('Usage')
+    plt.legend()
+    plt.show()
+
+# Saving the model as an h5 file
+pickle.dump(regressor, open("xgboost.dat", "wb"))
+# Saving formatted datasets
+np.savez('data_xgboost', usage_household, usage_test_labeled, train_dataset, test_dataset, id_list)
 
