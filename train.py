@@ -57,7 +57,7 @@ def feature_engineering(dataset, time_delay=1):
 # Importing the training dataset
 dataset_train = pd.read_csv('usage_train.csv')
 
-# Feature engineering with time delay = 48 y(one day, roughly two usage cycles)
+# Feature engineering with time delay = 48 (one day, roughly two usage cycles)
 usage_household, usage_test_labeled, train_dataset, test_dataset = feature_engineering(dataset_train)
 X_train = train_dataset.iloc[:, 1:-1].values
 y_train = train_dataset.iloc[:, 0].values.reshape(-1, 1)
