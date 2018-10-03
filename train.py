@@ -55,3 +55,31 @@ def feature_engineering(dataset, time_delay=1):
 
 # Importing the training dataset
 dataset_train = pd.read_csv('usage_train.csv')
+
+# Feature engineering with time delay = 48 y(one day, roughly two usage cycles)
+usage_household, usage_test_labeled, train_dataset, test_dataset = feature_engineering(dataset_train)
+X_train = train_dataset.iloc[:, 1:-1].values
+y_train = train_dataset.iloc[:, 0].values.reshape(-1, 1)
+
+# BUILDING THE MODEL - Part 2
+
+regressor = XGBRegressor()
+
+# Applying grid search k-fold cross validation
+parameters = {'max_depth': [3, 4, 5],
+              'learning_rate': [0.2, 0.1, 0.01],
+              'n_estimators': [50, 100, 200]}
+grid_search = GridSearchCV(estimator=regressor,
+                           param_grid=parameters,
+                           scoring='neg_mean_squared_error',
+                           cv=TimeSeriesSplit(n_splits=10),
+                           verbose=10)
+grid_search = grid_search.fit(X_train, y_train)
+best_parameters = grid_search.best_params_
+best_mse = grid_search.best_score_
+
+regressor = XGBRegressor(n_estimators=best_parameters['n_estimators'], max_depth=best_parameters['max_depth'],
+                         learning_rate=best_parameters['learning_rate'])
+regressor.fit(X_train, y_train)
+
+
