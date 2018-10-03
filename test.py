@@ -21,7 +21,7 @@ training_data = data['arr_2']
 id_arr = data['arr_4']
 len_household = int(training_data.shape[0] / len(id_arr))
 len_household_test = int(y_test.shape[0] / len(id_arr))
-y_pred_test = []
+y_pred_labeled = []
 for i in range(len(id_arr)):
     X_last_train = training_data[(i + 1) * len_household - 1, 1:].reshape(-1, 1)
     y_last_train = training_data[(i + 1) * len_household - 1, 0]
@@ -30,18 +30,43 @@ for i in range(len(id_arr)):
     X_test = np.reshape(X_test, (1, X_test.shape[0]))
     for j in range(len_household_test):
         y_regressor = regressor.predict(X_test)
-        y_pred_test.append(y_regressor[0])
+        y_pred_labeled.append(y_regressor[0])
         y_real = y_test[i * len_household_test + j]
         new_x = np.reshape(np.array([y_real, y_real - X_test[0][0]]), (1, 2))
         X_test = np.concatenate((new_x, X_test[:, :-2]), axis=1)
-y_pred_test = np.array(y_pred_test).reshape(-1, 1)
-mse_test = mean_squared_error(y_test, y_pred_test)
+y_pred_labeled = np.array(y_pred_labeled).reshape(-1, 1)
+mse_test = mean_squared_error(y_test, y_pred_labeled)
 
 for i in range(len(id_arr)):
     plt.plot(y_test[len_household_test*i:len_household_test*(i+1), 0], color='red', label=[id_arr[i] + ' actual values'])
-    plt.plot(y_pred_test[len_household_test*i:len_household_test*(i+1), 0], color='blue', label=[id_arr[i] +
+    plt.plot(y_pred_labeled[len_household_test * i:len_household_test * (i + 1), 0], color='blue', label=[id_arr[i] +
              ' predicted values'])
-    plt.title('Usage for the ' + id_arr[i] + ' household')
+    plt.title('Usage for the ' + id_arr[i] + ' household (LTD)')
+    plt.xlabel('Time')
+    plt.ylabel('Usage')
+    plt.legend()
+    plt.show()
+
+# Unlabelled test data prediction - Assuming no usage data for reference. Prediction at each time step is used to
+# predict the next ones
+y_pred_unlabelled = []
+for i in range(len(id_arr)):
+    X_last_test = test_data[(i + 1) * len_household_test - 1, 1:].reshape(-1, 1)
+    y_last_test = test_data[(i + 1) * len_household_test - 1, 0]
+    new_x = np.array([y_last_test, y_last_test - X_last_test[0][0]]).reshape(-1, 1)
+    X_test = np.concatenate((new_x, X_last_test[:-2]))
+    X_test = np.reshape(X_test, (1, X_test.shape[0]))
+    for j in range(len_household_test):
+        y_regressor = regressor.predict(X_test)
+        y_pred_unlabelled.append(y_regressor[0])
+        new_x = np.reshape(np.array([y_regressor[0], y_regressor[0] - X_test[0][0]]), (1, 2))
+        X_test = np.concatenate((new_x, X_test[:, :-2]), axis=1)
+y_pred_unlabelled = np.array(y_pred_unlabelled).reshape(-1, 1)
+
+for i in range(len(id_arr)):
+    plt.plot(y_pred_unlabelled[len_household_test * i:len_household_test * (i + 1), 0], color='blue', label=[id_arr[i] +
+             ' predicted values'])
+    plt.title('Usage for the ' + id_arr[i] + ' household (UTD)')
     plt.xlabel('Time')
     plt.ylabel('Usage')
     plt.legend()
